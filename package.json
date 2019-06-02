@@ -1,0 +1,23 @@
+{
+  "name": "discord-bot-quest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/01ghost13/discord-bot-quest.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/01ghost13/discord-bot-quest/issues"
+  },
+  "homepage": "https://github.com/01ghost13/discord-bot-quest#readme",
+  "dependencies": {
+    "discord.js": "^11.5.1"
+  }
+}
