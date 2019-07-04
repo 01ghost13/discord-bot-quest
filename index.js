@@ -109,7 +109,7 @@ client.on('message', message => { // todo: go to async/await
                 .query(`SELECT * FROM "${Message.tableName}"`, { type: sequelize.QueryTypes.SELECT })
                 .then((res) => {
 
-                    let filename = `${__dirname}\\${moment().format('DD_MM_YYYY_HH_mm_ss')}_messages.json`;
+                    let filename = `${__dirname}/${moment().format('DD_MM_YYYY_HH_mm_ss')}_messages.json`;
 
                     fs.writeFile(filename, JSON.stringify(res), (error) => {
 
