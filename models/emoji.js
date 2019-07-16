@@ -14,10 +14,12 @@ module.exports = (sequelize, DataTypes) => {
             tableName: 'Emojies',
             modelName: 'Emoji',
 
+            paranoid:   true,
             timestamps: true,
+
             createdAt:  'created_at',
             updatedAt:  'updated_at',
-            deletedAt:  false,
+            deletedAt:  'deleted_at',
         }
     );
 
@@ -37,6 +39,23 @@ module.exports = (sequelize, DataTypes) => {
                 type: sequelize.QueryTypes.UPDATE
             }
         );
+    };
+
+    Emoji.removeNonExistingEmoji = function (message) {
+        Emoji
+            .findAll({
+                where: {
+                    channel_id: message.channel.id,
+                },
+            })
+            .then(emojies => {
+                emojies.forEach(emoji => {
+                    if (!message.guild.emojis.find(val => val.id === emoji.discord_id)) {
+                        emoji.destroy();
+                        console.log('Emoji deleted.');
+                    }
+                });
+            });
     };
 
     return Emoji;

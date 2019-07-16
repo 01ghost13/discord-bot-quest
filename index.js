@@ -210,6 +210,10 @@ client.on('message', message => { // todo: go to async/await
             });
     }
 
+
+    // Check deleted emoji
+    Emoji.removeNonExistingEmoji(message);
+
 });
 
 
