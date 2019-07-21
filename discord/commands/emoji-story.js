@@ -7,28 +7,26 @@ module.exports = {
     description: 'статистика использования смайлов',
     /*aliases: ['commands'],*/
     /*usage: '[command name]',*/
-    execute(message, args) {
-        Emoji
-            .findAll({
-                where: {
-                    channel_id: message.channel.id,
-                },
-                order: [
-                    ['count', 'DESC']
-                ]
-            })
-            .then(emojies => {
-                let response = '';
+    async execute(message, args) {
+        let
+            response = '',
+            emojies  = await Emoji.findAll({
+            where: {
+                channel_id: message.channel.id,
+            },
+            order: [
+                ['count', 'DESC']
+            ]
+        });
 
-                emojies.forEach(emoji => {
-                    if (!message.guild.emojis.find(val => val.id === emoji.discord_id)) {
-                        return;
-                    }
+        emojies.forEach(emoji => {
+            if (!message.guild.emojis.find(val => val.id === emoji.discord_id)) {
+                return;
+            }
 
-                    response += `<:${emoji.name}:${emoji.discord_id}> — ${emoji.count}\n`;
-                });
+            response += `<:${emoji.name}:${emoji.discord_id}> — ${emoji.count}\n`;
+        });
 
-                message.channel.send(response);
-            });
+        message.channel.send(response);
     },
 };
