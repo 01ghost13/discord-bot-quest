@@ -1,11 +1,70 @@
-const Discord = require('discord.js');
-const client = new Discord.Client();
-const config = require('./config.js');
-const environment = process.env.NODE_ENV || 'development';
-const environmentConfig = config[environment];
+'use strict';
 
-client.once('ready', () => {
+const db     = require('./database');
+const bot    = require('./discord');
+const config = require('./config');
+
+const Emoji   = db.models.Emoji;
+const Message = db.models.Message;
+
+
+bot.once('ready', async () => {
+    try {
+        await db.connection.authenticate();
+        console.log('Connection has been established successfully.');
+    }
+    catch (err) {
+        bot.destroy();
+        console.error('Unable to connect to the database:', err);
+
+        return;
+    }
+
 	console.log('Ready!');
 });
 
-client.login(environmentConfig.BOT_TOKEN);
+
+bot.on('message', message => {
+    if (!message.content.startsWith(config.prefix) || message.author.bot) return;
+
+    const args        = message.content.slice(config.prefix.length).split(/ +/);
+    const commandName = args.shift().toLowerCase();
+
+    if (!bot.commands.has(commandName)) return;
+
+    const command = bot.commands.get(commandName);
+
+    try {
+        command.execute(message, args);
+    }
+    catch (error) {
+        console.error(error);
+        message.reply('there was an error trying to execute that command!');
+    }
+});
+
+
+bot.on('message', message => {
+    if (message.content.startsWith(config.prefix) || message.author.bot) return;
+
+
+    // Save message
+    Message.create({
+        discord_id: message.id,
+        author:     message.author.id,
+        content:    message.content,
+        channel_id: message.channel.id,
+    });
+
+
+    // Get all emojies from message
+    let emojies = Emoji.getFromMessage(message.content);
+
+    // Update emojies
+    for (let emoji_id in emojies) {
+        Emoji.createOrUpdate(message.channel.id, emojies[emoji_id]);
+    }
+});
+
+
+bot.login(config.BOT_TOKEN);
