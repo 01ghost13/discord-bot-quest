@@ -1,4 +1,5 @@
-const config = require('../config/config.js');
+const db    = require('../../database');
+const Emoji = db.models.Emoji;
 
 
 module.exports = {
@@ -6,10 +7,7 @@ module.exports = {
     description: 'статистика использования смайлов',
     /*aliases: ['commands'],*/
     /*usage: '[command name]',*/
-    execute(message, args, sequelize) {
-
-        const Emoji = sequelize.import('../models/emoji'); // todo: тоже шок контент
-
+    execute(message, args) {
         Emoji
             .findAll({
                 where: {
@@ -32,6 +30,5 @@ module.exports = {
 
                 message.channel.send(response);
             });
-
     },
 };
