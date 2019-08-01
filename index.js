@@ -2,16 +2,24 @@
 
 const db     = require('./database');
 const bot    = require('./discord');
+const redis  = require('./redis');
 const config = require('./config');
 
 const Emoji   = db.models.Emoji;
 const Message = db.models.Message;
 
 
+
+
+redis.once('ready', async () => {
+    console.log('Redis ready!');
+});
+
+
 bot.once('ready', async () => {
     try {
         await db.connection.authenticate();
-        console.log('Connection has been established successfully.');
+        console.log('Connection to the database has been established successfully.');
     }
     catch (err) {
         bot.destroy();
@@ -20,7 +28,7 @@ bot.once('ready', async () => {
         return;
     }
 
-	console.log('Ready!');
+	console.log('Bot ready!');
 });
 
 

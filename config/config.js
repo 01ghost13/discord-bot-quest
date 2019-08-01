@@ -18,6 +18,10 @@ module.exports = {
             "limit": process.env.MESSAGES_EXPORT_LIMIT,
             "channel": process.env.MESSAGES_EXPORT_CHANNEL,
         },
+
+        "redis": {
+            "url": process.env.REDIS_URL,
+        },
     },
     "production": {
         "prefix": "!",
@@ -37,6 +41,10 @@ module.exports = {
         "messagesExport" : {
             "limit": process.env.MESSAGES_EXPORT_LIMIT,
             "channel": process.env.MESSAGES_EXPORT_CHANNEL,
+        },
+
+        "redis": {
+            "url": process.env.REDIS_URL,
         },
     }
 };
