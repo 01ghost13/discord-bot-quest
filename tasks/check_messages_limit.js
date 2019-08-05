@@ -21,13 +21,7 @@ bot.once('ready', async () => {
         count = +res[0].count;
 
     if (count < config.messagesExport.limit) {
-        await bot
-            .channels
-            .get(config.messagesExport.channel)
-            .send(`Использовано ${count} строк из ${config.messagesExport.limit}.`);
-
         bot.destroy();
-
         return;
     }
 
