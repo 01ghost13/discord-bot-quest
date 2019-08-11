@@ -2,6 +2,7 @@
 
 const db     = require('./database');
 const bot    = require('./discord');
+const api    = require('./api');
 const redis  = require('./redis');
 const config = require('./config');
 
@@ -13,6 +14,11 @@ const Message = db.models.Message;
 
 redis.once('ready', async () => {
     console.log('Redis ready!');
+});
+
+
+api.listen(config.api.port, () => {
+    console.log(`Api ready on port ${config.api.port}!`);
 });
 
 

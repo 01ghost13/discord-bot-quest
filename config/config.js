@@ -4,6 +4,8 @@ module.exports = {
 
         "BOT_TOKEN": process.env.BOT_TOKEN,
 
+        "SECURE_TOKEN": process.env.SECURE_TOKEN,
+
         "database": {
             "url": process.env.DATABASE_URL,
             "dialect": "postgres",
@@ -21,6 +23,10 @@ module.exports = {
 
         "redis": {
             "url": process.env.REDIS_URL,
+        },
+
+        "api": {
+            "port": process.env.API_PORT,
         },
     },
     "production": {
@@ -28,6 +34,8 @@ module.exports = {
 
         "BOT_TOKEN": process.env.BOT_TOKEN,
 
+        "SECURE_TOKEN": process.env.SECURE_TOKEN,
+
         "database": {
             "url": process.env.DATABASE_URL,
             "dialect": "postgres",
@@ -45,6 +53,10 @@ module.exports = {
 
         "redis": {
             "url": process.env.REDIS_URL,
+        },
+
+        "api": {
+            "port": process.env.API_PORT,
         },
     }
 };
