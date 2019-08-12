@@ -10,7 +10,7 @@ module.exports = (handler) => {
             handler(req, res);
         }
         else {
-            throw new ResponseError('Not authorized!', 401);
+            throw new ResponseError('Not authorized!', 401, false);
         }
     };
 };
