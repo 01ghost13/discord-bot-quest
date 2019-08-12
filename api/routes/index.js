@@ -12,4 +12,7 @@ module.exports = (express) => {
     // Say to channel
     express.post('/channels/say', secure(controllers.channels.say));
 
+    // Get emojis from channel
+    express.post('/channels/emojis', secure(controllers.channels.emojis));
+
 };

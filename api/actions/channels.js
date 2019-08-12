@@ -36,4 +36,24 @@ module.exports = class Channels {
 
         return channels;
     }
+
+    static getChannelEmojis(id) {
+        const channel = bot.channels.get(id);
+
+        if (!channel) {
+            throw new ResponseError('Channel does not exist!', 500);
+        }
+
+        let emojis = {};
+
+        channel.guild.emojis.forEach(emoji => {
+            emojis[emoji.id] = {
+                id:        emoji.id,
+                name:      emoji.name,
+                animated: +emoji.animated,
+            };
+        });
+
+        return emojis;
+    }
 };

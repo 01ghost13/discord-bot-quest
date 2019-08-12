@@ -24,4 +24,9 @@ module.exports = {
         }
     },
 
+    // Get emojis from channel
+    emojis: (req, res) => {
+        ResponseSuccess.send(res, Channels.getChannelEmojis(req.body.channel_id));
+    },
+
 };
