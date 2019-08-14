@@ -5,15 +5,15 @@ const ResponseError = require('../response-error');
 
 
 module.exports = class Channels {
-    static async sayToChannel(id, content) {
-        const channel = bot.channels.get(id);
+    static async sayToChannel(channel_id, content) {
+        if (!content) {
+            throw new ResponseError('Content is empty!', 500);
+        }
+
+        const channel = bot.channels.get(channel_id);
 
         if (!channel) {
             throw new ResponseError('Channel does not exist!', 500);
-        }
-
-        if (!content) {
-            throw new ResponseError('Content is empty!', 500);
         }
 
         return channel.send(content);
@@ -37,8 +37,8 @@ module.exports = class Channels {
         return channels;
     }
 
-    static getChannelEmojis(id) {
-        const channel = bot.channels.get(id);
+    static getChannelEmojis(channel_id) {
+        const channel = bot.channels.get(channel_id);
 
         if (!channel) {
             throw new ResponseError('Channel does not exist!', 500);

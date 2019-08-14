@@ -7,12 +7,12 @@ const ResponseSuccess = require('../response-success');
 
 module.exports = {
 
-    // Get all channels
+    // GET /channels/all
     all: (req, res) => {
         ResponseSuccess.send(res, Channels.getAll());
     },
 
-    // Say to channel
+    // POST /channels/say
     say: async (req, res) => {
         try {
             await Channels.sayToChannel(req.body.channel_id, req.body.content);
@@ -24,7 +24,7 @@ module.exports = {
         }
     },
 
-    // Get emojis from channel
+    // GET /channels/emojis
     emojis: (req, res) => {
         ResponseSuccess.send(res, Channels.getChannelEmojis(req.body.channel_id));
     },
