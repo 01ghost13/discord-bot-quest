@@ -6,11 +6,6 @@ module.exports = class ResponseSuccess {
     }
 
     static send(res, data = {}) {
-        res.status(200).json({
-            meta: {
-                status: 200
-            },
-            data: data
-        });
+        res.status(200).json(data);
     }
 };
