@@ -15,10 +15,9 @@ module.exports = class ResponseError extends Error {
         }
 
         res.status(err.code).json({
-            meta: {
-                status: err.code
-            },
-            error: /*err.name + ': ' + */err.message
+            code:    err.code,
+            name:    err.name,
+            message: err.message
         });
     }
 };
