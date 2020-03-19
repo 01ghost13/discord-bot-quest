@@ -18,7 +18,39 @@ for (const file of commandFiles) {
 
 
 client.on('message', message => {
-    if (!message.content.startsWith(config.prefix) || message.author.bot) return;
+    const
+        isCommand     = message.content.startsWith(config.prefix),
+        isMentionsBot = message.mentions.users.size > 0 && message.mentions.users.first().id === client.user.id;
+
+    if (message.author.bot || !(isMentionsBot || isCommand)) {
+        return;
+    }
+
+    // TODO: обобщить костыль
+    if (isMentionsBot) {
+        const match = message
+            .content
+            .replace(/долл?ар/i, 'usd')
+            .replace(/евр/i, 'eur')
+            .match(/usd|eur/i);
+
+        if (match !== null && ['usd', 'eur'].includes(match[0])) {
+            const code = match[0];
+
+            try {
+                client
+                    .commands
+                    .get('exchange')
+                    .execute(message, [code]);
+            }
+            catch (error) {
+                console.error(error);
+                message.reply('there was an error trying to execute that command!');
+            }
+        }
+
+        return;
+    }
 
     const args        = message.content.slice(config.prefix.length).split(/ +/);
     const commandName = args.shift().toLowerCase();
