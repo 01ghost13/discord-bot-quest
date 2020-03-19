@@ -1,5 +1,6 @@
 const axios = require('axios');
 const jimp = require('jimp');
+const fs = require('fs');
 
 const imgUrl = 'https://memepedia.ru/wp-content/uploads/2018/01/%D0%BC%D0%B5%D0%BC-%D0%B8-%D0%BC%D0%BE%D0%B5%D0%BC%D1%83-%D1%81%D1%8B%D0%BD%D1%83-%D1%82%D0%BE%D0%B6%D0%B5-6.jpg';
 
@@ -37,7 +38,13 @@ module.exports = {
                     img.print(font, 15, 5, `МНЕ ${map[code]} ПО ${val.toFixed(2)} И МОЕМУ СЫНУ ТОЖЕ`);
                     img.write('__exchange_img.jpg');
 
-                    message.channel.send(``, { files: [ '__exchange_img.jpg' ] });
+                    await message.channel.send(``, { files: [ '__exchange_img.jpg' ] });
+
+                    fs.unlink('__exchange_img.jpg', (err) => {
+                        if (err) {
+                            console.error(err);
+                        }
+                    });
                 }
             }
 
