@@ -28,6 +28,21 @@ client.on('message', message => {
 
     // TODO: обобщить костыль
     if (isMentionsBot) {
+        if (message.content.match(/общий сбор/i) !== null) {
+            try {
+                client
+                    .commands
+                    .get('conscription')
+                    .execute(message);
+            }
+            catch (error) {
+                console.error(error);
+                message.reply('there was an error trying to execute that command!');
+            }
+
+            return;
+        }
+
         const match = message
             .content
             .replace(/долл?ар/i, 'usd')
