@@ -53,20 +53,22 @@ async function getStats() {
 
     const textTrim = obj => String(obj.text()).trim();
 
+    const worldTr  = $('table#main_table_countries_today tbody tr > td:contains("World")', worldometers).parent();
     const russiaTr = $('table#main_table_countries_today tbody tr > td:contains("Russia")', worldometers).parent();
     const vlgStatsBlock = () => $('div.covid-panel-view div.covid-panel-view__item-name:contains("Волгоградская область")', yandex).parent();
-    const worldStatsSelector = child => `body > div.container > div:nth-child(2) > div.col-md-8 > div > div:nth-child(${child}) > div.maincounter-number`;
 
     return {
         worldStats: {
             infected: {
-                total: textTrim($(worldStatsSelector(7), worldometers)),
+                total: textTrim(worldTr.find('td:nth-child(2)')),
+                plus: textTrim(worldTr.find('td:nth-child(3)')),
             },
             dead: {
-                total: textTrim($(worldStatsSelector(9), worldometers)),
+                total: textTrim(worldTr.find('td:nth-child(4)')),
+                plus: textTrim(worldTr.find('td:nth-child(5)')),
             },
             recovered: {
-                total: textTrim($(worldStatsSelector(10), worldometers)),
+                total: textTrim(worldTr.find('td:nth-child(6)')),
             },
         },
         russiaStats: {
@@ -108,6 +110,7 @@ module.exports = {
         };
 
         const russiaEmoji = message.guild.emojis.find(val => val.id === '522863886865793027') ? ` <a:sukablyatDance:522863886865793027>` : ``;
+        const separateSpace = str => str.replace('+', ' + ');
 
         const embed = new Discord.RichEmbed()
             .setTitle('COVID-19 CORONAVIRUS PANDEMIC')
@@ -117,8 +120,8 @@ module.exports = {
             .addField(
                 '**ВЕСЬ МИР**',
                 [
-                    `${emojies.infected} ${stats.worldStats.infected.total}`,
-                    `${emojies.dead} ${stats.worldStats.dead.total}`,
+                    `${emojies.infected} ${separateSpace(stats.worldStats.infected.total + stats.worldStats.infected.plus)}`,
+                    `${emojies.dead} ${separateSpace(stats.worldStats.dead.total + stats.worldStats.dead.plus)}`,
                     `${emojies.recovered} ${stats.worldStats.recovered.total}`
                 ].join('\n'),
                 true
@@ -126,8 +129,8 @@ module.exports = {
             .addField(
                 `**РОССИЯ**${russiaEmoji}`,
                 [
-                    `${emojies.infected} ${stats.russiaStats.infected.total}`,
-                    `${emojies.dead} ${stats.russiaStats.dead.total}`,
+                    `${emojies.infected} ${separateSpace(stats.russiaStats.infected.total + stats.russiaStats.infected.plus)}`,
+                    `${emojies.dead} ${separateSpace(stats.russiaStats.dead.total + stats.russiaStats.dead.plus)}`,
                     `${emojies.recovered} ${stats.russiaStats.recovered.total}`
                 ].join('\n'),
                 true
