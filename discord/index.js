@@ -28,6 +28,21 @@ client.on('message', message => {
 
     // TODO: обобщить костыль
     if (isMentionsBot) {
+        if (message.content.match(/крути|колесо|закру[чт]/i) !== null) {
+            try {
+                client
+                    .commands
+                    .get('fortune-wheel')
+                    .execute(message);
+            }
+            catch (error) {
+                console.error(error);
+                message.reply('there was an error trying to execute that command!');
+            }
+
+            return;
+        }
+
         if (message.content.match(/корон[а|е]|коронавирус|covid(-19)?|coronavirus/i) !== null) {
             try {
                 client
