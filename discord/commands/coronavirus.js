@@ -55,7 +55,42 @@ async function getStats() {
 
     const worldTr  = $('table#main_table_countries_today tbody tr > td:contains("World")', worldometers).parent();
     const russiaTr = $('table#main_table_countries_today tbody tr > td:contains("Russia")', worldometers).parent();
-    const vlgStatsBlock = () => $('div.covid-panel-view div.covid-panel-view__item-name:contains("Волгоградская область")', yandex).parent();
+
+    let vlgData = undefined;
+
+    try {
+        const data = JSON.parse($('script.config-view', yandex).html());
+
+        if (!('covidData' in data)) {
+            throw new Error('Not found "covidData" in data!');
+        }
+        if (!('items' in data.covidData)) {
+            throw new Error('Not found "items" in data.covidData!');
+        }
+
+        for (const datum of data.covidData.items) {
+            if ('name' in datum && datum.name === 'Волгоградская область') {
+                vlgData = datum;
+            }
+        }
+
+        if (vlgData === undefined) {
+            throw new Error('Not found vlg in data!');
+        }
+    } catch (e) {
+        console.error('Wrong yandex data! Error: ' + e.message);
+    }
+
+    const safeGetVlgData = (name) => {
+        return vlgData !== undefined && name in vlgData ? vlgData[name] : '';
+    };
+
+    const getVlgInfectedPlus = () => {
+        if (safeGetVlgData('cases') === '' || !Array.isArray(safeGetVlgData('histogram'))) {
+            return '';
+        }
+        return `+${String(Number(vlgData.cases) - Number(vlgData.histogram.slice(-2, -1)[0].value))}`;
+    };
 
     return {
         worldStats: {
@@ -86,8 +121,12 @@ async function getStats() {
         },
         vlgStats: {
             infected: {
-                total: textTrim(vlgStatsBlock().find('div.covid-panel-view__item-cases'))
-            }
+                total: String(safeGetVlgData('cases')),
+                plus: getVlgInfectedPlus(),
+            },
+            dead: {
+                total: String(safeGetVlgData('deaths')),
+            },
         }
     };
 }
@@ -110,7 +149,7 @@ module.exports = {
         };
 
         const russiaEmoji = message.guild.emojis.find(val => val.id === '522863886865793027') ? ` <a:sukablyatDance:522863886865793027>` : ``;
-        const separateSpace = str => str.replace('+', ' + ');
+        const separatePlus = str => str.replace('+', ' + ');
 
         const embed = new Discord.RichEmbed()
             .setTitle('COVID-19 CORONAVIRUS PANDEMIC')
@@ -120,8 +159,8 @@ module.exports = {
             .addField(
                 '**ВЕСЬ МИР**',
                 [
-                    `${emojies.infected} ${separateSpace(stats.worldStats.infected.total + stats.worldStats.infected.plus)}`,
-                    `${emojies.dead} ${separateSpace(stats.worldStats.dead.total + stats.worldStats.dead.plus)}`,
+                    `${emojies.infected} ${separatePlus(stats.worldStats.infected.total + stats.worldStats.infected.plus)}`,
+                    `${emojies.dead} ${separatePlus(stats.worldStats.dead.total + stats.worldStats.dead.plus)}`,
                     `${emojies.recovered} ${stats.worldStats.recovered.total}`
                 ].join('\n'),
                 true
@@ -129,15 +168,18 @@ module.exports = {
             .addField(
                 `**РОССИЯ**${russiaEmoji}`,
                 [
-                    `${emojies.infected} ${separateSpace(stats.russiaStats.infected.total + stats.russiaStats.infected.plus)}`,
-                    `${emojies.dead} ${separateSpace(stats.russiaStats.dead.total + stats.russiaStats.dead.plus)}`,
+                    `${emojies.infected} ${separatePlus(stats.russiaStats.infected.total + stats.russiaStats.infected.plus)}`,
+                    `${emojies.dead} ${separatePlus(stats.russiaStats.dead.total + stats.russiaStats.dead.plus)}`,
                     `${emojies.recovered} ${stats.russiaStats.recovered.total}`
                 ].join('\n'),
                 true
             )
             .addField(
                 '**ВОЛГОГРАД**',
-                `${emojies.infected} ${stats.vlgStats.infected.total}`,
+                [
+                    `${emojies.infected} ${separatePlus(stats.vlgStats.infected.total + stats.vlgStats.infected.plus)}`,
+                    `${emojies.dead} ${stats.vlgStats.dead.total}`,
+                ].join('\n'),
                 true
             );
 
