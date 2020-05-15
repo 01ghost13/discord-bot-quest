@@ -56,7 +56,30 @@ async function getStats() {
     const worldTr  = $('table#main_table_countries_today tbody tr > td:contains("World")', worldometers).parent();
     const russiaTr = $('table#main_table_countries_today tbody tr > td:contains("Russia")', worldometers).parent();
 
+    let top = [];
+    let russiaData = {
+        name: 'Россия',
+        infected: {
+            total: 0,
+            plus: 0,
+        },
+        dead: {
+            total: 0,
+        },
+    };
     let vlgData = undefined;
+
+    const safeGetData = (obj, name) => {
+        return obj !== undefined && name in obj ? obj[name] : '';
+    };
+
+    const getInfectedPlus = (obj) => {
+        if (safeGetData(obj, 'cases') === '' || !Array.isArray(safeGetData(obj, 'histogram'))) {
+            return '';
+        }
+
+        return `+${String(Number(obj.cases) - Number(obj.histogram.slice(-2, -1)[0].value))}`;
+    };
 
     try {
         const data = JSON.parse($('script.config-view', yandex).html());
@@ -72,7 +95,29 @@ async function getStats() {
             if ('name' in datum && datum.name === 'Волгоградская область') {
                 vlgData = datum;
             }
+
+            const curr = {
+                name: datum.name,
+                infected: {
+                    total: String(safeGetData(datum, 'cases')),
+                    plus: getInfectedPlus(datum),
+                },
+                dead: {
+                    total: String(safeGetData(datum, 'deaths')),
+                },
+            };
+
+            top.push(curr);
+
+            if ('ru' in datum && datum.ru === true) {
+                russiaData.infected.total += +curr.infected.total;
+                russiaData.infected.plus  += +curr.infected.plus;
+
+                russiaData.dead.total += +curr.dead.total;
+            }
         }
+
+        top.push(russiaData);
 
         if (vlgData === undefined) {
             throw new Error('Not found vlg in data!');
@@ -81,53 +126,43 @@ async function getStats() {
         console.error('Wrong yandex data! Error: ' + e.message);
     }
 
-    const safeGetVlgData = (name) => {
-        return vlgData !== undefined && name in vlgData ? vlgData[name] : '';
-    };
-
-    const getVlgInfectedPlus = () => {
-        if (safeGetVlgData('cases') === '' || !Array.isArray(safeGetVlgData('histogram'))) {
-            return '';
-        }
-        return `+${String(Number(vlgData.cases) - Number(vlgData.histogram.slice(-2, -1)[0].value))}`;
-    };
-
     return {
         worldStats: {
             infected: {
-                total: textTrim(worldTr.find('td:nth-child(2)')),
-                plus: textTrim(worldTr.find('td:nth-child(3)')),
+                total: textTrim(worldTr.find('td:nth-child(3)')),
+                plus: textTrim(worldTr.find('td:nth-child(4)')),
             },
             dead: {
-                total: textTrim(worldTr.find('td:nth-child(4)')),
-                plus: textTrim(worldTr.find('td:nth-child(5)')),
+                total: textTrim(worldTr.find('td:nth-child(5)')),
+                plus: textTrim(worldTr.find('td:nth-child(6)')),
             },
             recovered: {
-                total: textTrim(worldTr.find('td:nth-child(6)')),
+                total: textTrim(worldTr.find('td:nth-child(7)')),
             },
         },
         russiaStats: {
             infected: {
-                total: textTrim(russiaTr.find('td:nth-child(2)')),
-                plus: textTrim(russiaTr.find('td:nth-child(3)')),
+                total: textTrim(russiaTr.find('td:nth-child(3)')),
+                plus: textTrim(russiaTr.find('td:nth-child(4)')),
             },
             dead: {
-                total: textTrim(russiaTr.find('td:nth-child(4)')),
-                plus: textTrim(russiaTr.find('td:nth-child(5)')),
+                total: textTrim(russiaTr.find('td:nth-child(5)')),
+                plus: textTrim(russiaTr.find('td:nth-child(6)')),
             },
             recovered: {
-                total: textTrim(russiaTr.find('td:nth-child(6)')),
+                total: textTrim(russiaTr.find('td:nth-child(7)')),
             },
         },
         vlgStats: {
             infected: {
-                total: String(safeGetVlgData('cases')),
-                plus: getVlgInfectedPlus(),
+                total: String(safeGetData(vlgData, 'cases')),
+                plus: getInfectedPlus(vlgData),
             },
             dead: {
-                total: String(safeGetVlgData('deaths')),
+                total: String(safeGetData(vlgData, 'deaths')),
             },
-        }
+        },
+        top: top.sort((a, b) => b.infected.total - a.infected.total).slice(0, 5)
     };
 }
 
@@ -150,6 +185,19 @@ module.exports = {
 
         const russiaEmoji = message.guild.emojis.find(val => val.id === '522863886865793027') ? ` <a:sukablyatDance:522863886865793027>` : ``;
         const separatePlus = str => str.replace('+', ' + ');
+
+        const formatNumber = num => {
+            // ¯\_(ツ)_/¯
+            return String(num)
+                .split('')
+                .reverse()
+                .map((elem, idx) => `${idx % 3 === 0 ? ' ' : ''}${elem}`)
+                .join('')
+                .split('')
+                .reverse()
+                .join('')
+                .trim();
+        };
 
         const embed = new Discord.RichEmbed()
             .setTitle('COVID-19 CORONAVIRUS PANDEMIC')
@@ -181,6 +229,14 @@ module.exports = {
                     `${emojies.dead} ${stats.vlgStats.dead.total}`,
                 ].join('\n'),
                 true
+            )
+            .addField(
+                '**ТОП УСПЕШНЫХ**',
+                stats
+                    .top
+                    .map(elem => `**${formatNumber(elem.infected.total)}** ${elem.name}`)
+                    .join('\n'),
+                false
             );
 
         await message.channel.send(embed);
