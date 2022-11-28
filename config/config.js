@@ -9,9 +9,7 @@ module.exports = {
         "database": {
             "url": process.env.DATABASE_URL,
             "dialect": "postgres",
-            "dialectOptions": {
-                "ssl": true
-            }
+            "dialectOptions": {}
         },
 
         "channelForErrors": process.env.CHANNEL_FOR_ERRORS,
@@ -26,7 +24,7 @@ module.exports = {
         },
 
         "api": {
-            "port": process.env.API_PORT,
+            "port": process.env.API_PORT || 3000,
         },
     },
     "production": {
@@ -39,9 +37,7 @@ module.exports = {
         "database": {
             "url": process.env.DATABASE_URL,
             "dialect": "postgres",
-            "dialectOptions": {
-                "ssl": true
-            }
+            "dialectOptions": {}
         },
 
         "channelForErrors": process.env.CHANNEL_FOR_ERRORS,
@@ -56,7 +52,7 @@ module.exports = {
         },
 
         "api": {
-            "port": process.env.API_PORT,
+            "port": process.env.API_PORT || 3000,
         },
     }
 };

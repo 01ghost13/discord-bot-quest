@@ -17,7 +17,7 @@ redis.once('ready', async () => {
 });
 
 
-api.listen(process.env.PORT || 3000, () => {
+api.listen(config.api.port || 3000, () => {
     console.log(`Api ready on port ${config.api.port}!`);
 });
 
