@@ -3,7 +3,7 @@
 const fs     = require('fs');
 const config = require('../config');
 
-const Sequelize = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 
 const connection = new Sequelize(
     config.database.url,
@@ -21,7 +21,7 @@ const model_files = fs.readdirSync(__dirname + '/../models').filter(file => file
 const getModelName = (file) => file.charAt(0).toUpperCase() + file.slice(1).replace('.js', '');
 
 for (const file of model_files) {
-    models[getModelName(file)] = connection.import(__dirname + `/../models/${file}`);
+    models[getModelName(file)] = require(__dirname + `/../models/${file}`)(connection, DataTypes);
 }
 
 module.exports = {

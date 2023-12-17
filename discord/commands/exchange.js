@@ -38,7 +38,7 @@ module.exports = {
                     img.print(font, 15, 5, `МНЕ ${map[code]} ПО ${val.toFixed(2)} И МОЕМУ СЫНУ ТОЖЕ`);
                     img.write('__exchange_img.jpg');
 
-                    await message.channel.send(``, { files: [ '__exchange_img.jpg' ] });
+                    await message.channel.send({ files: [ '__exchange_img.jpg' ] });
 
                     fs.unlink('__exchange_img.jpg', (err) => {
                         if (err) {

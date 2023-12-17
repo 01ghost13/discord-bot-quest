@@ -4,7 +4,9 @@ networks:
 
 services:
   node:
-    image: node:13.12.0-alpine3.10
+    build:
+      context: .
+      dockerfile: Dockerfile
     user: node
     restart: always
     networks:
@@ -15,6 +17,7 @@ services:
     volumes:
       - .:/app:rw
     environment:
+      TZ: "Europe/Moscow"
       NODE_ENV: "production"
 
       BOT_TOKEN: "${BOT_TOKEN}"
@@ -37,8 +40,6 @@ services:
       POSTGRES_USER: "root"
       POSTGRES_PASSWORD: "root"
       PGDATA: "/var/lib/postgresql/data/pgdata"
-    ports:
-      - '5432:5432'
     volumes:
       - /var/discord-bot-postgresql:/var/lib/postgresql/data:rw
     healthcheck:
@@ -52,8 +53,6 @@ services:
     restart: always
     networks:
       - bot-network
-    ports:
-      - "6379:6379"
     volumes:
       - /var/discord-bot-redis:/data:rw
     healthcheck:

@@ -2,11 +2,24 @@
 
 const fs      = require('fs');
 const config  = require('../config');
-const Discord = require('discord.js');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
-
-const client    = new Discord.Client();
-client.commands = new Discord.Collection();
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildWebhooks,
+        GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildIntegrations,
+        GatewayIntentBits.GuildMessageTyping,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildEmojisAndStickers,
+    ],
+});
+client.commands = new Collection();
 
 const commandFiles = fs.readdirSync(__dirname + '/commands').filter(file => file.endsWith('.js'));
 

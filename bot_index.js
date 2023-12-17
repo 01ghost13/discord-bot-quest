@@ -1,5 +1,7 @@
 'use strict';
 
+const gm = require('gm').subClass({ imageMagick: true });
+
 const db     = require('./database');
 const bot    = require('./discord');
 const api    = require('./api');
@@ -43,7 +45,7 @@ bot.on('message', message => {
 
 
     // Save message
-    Message.create({
+    Message.create({ // todo: не сейвится... ну и команды не работают кекв
         discord_id: message.id,
         author:     message.author.id,
         content:    message.content,
@@ -61,4 +63,57 @@ bot.on('message', message => {
 });
 
 
-bot.login(config.BOT_TOKEN);
+(async () => {
+    await bot.login(config.BOT_TOKEN);
+
+    const jekaId = '172822815303663618';
+    const guildId = '177172000391954432';
+    const channelId = '177172000391954432';
+
+    const jeka = await bot.users.fetch(jekaId);
+    const guild = await bot.guilds.fetch(guildId);
+    const channel = await bot.channels.fetch(channelId);
+
+    jeka.client.addListener('presenceUpdate', async (oldPresence, newPresence) => {
+        if (oldPresence.guild.id !== guildId) {
+            // только для конкретного сервера
+            return;
+        }
+
+        if (oldPresence.activities.length === 0 && newPresence.activities.length > 0) {
+            if (Math.random() < .5) {
+                return;
+            }
+
+            const filename = '/tmp/__jeka_playing_img.jpg';
+
+            const sender = async () => {
+                await channel.send({ files: [ filename ] });
+
+                if (Math.random() < .2) {
+                    await channel.send('мнение?');
+                }
+            };
+
+            const jekaInChannel = guild.members.cache.get(jekaId);
+
+            let text = `${jekaInChannel.nickname} играет в ${newPresence.activities[0].name}`;
+
+            if (jekaInChannel.nickname.length > 20) {
+                text = `${jekaInChannel.nickname}\nиграет в ${newPresence.activities[0].name}`;
+            }
+
+            gm('https://i.imgur.com/FQdRJy6.png')
+                .font('./font/PressStart2P-Regular.ttf', 20)
+                .drawText(30, 50, text)
+                .write(filename, function (err) {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+
+                    sender();
+                });
+        }
+    });
+})();

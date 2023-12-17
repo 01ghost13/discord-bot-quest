@@ -65,11 +65,9 @@ module.exports = {
 
         const response = responses[ Math.floor(Math.random() * responses.length) ];
 
-        message.channel.send(
-            `${mentions.join(' ')} ${response.phrase}`,
-            {
-                files: [ response.imgUrl ]
-            }
-        );
+        message.channel.send({
+            content: `${mentions.join(' ')} ${response.phrase}`,
+            files: [ response.imgUrl ]
+        });
     },
 };
