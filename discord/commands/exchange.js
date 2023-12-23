@@ -36,19 +36,18 @@ module.exports = {
                     const img = await jimp.read(imgUrl);
 
                     img.print(font, 15, 5, `МНЕ ${map[code]} ПО ${val.toFixed(2)} И МОЕМУ СЫНУ ТОЖЕ`);
-                    img.write('__exchange_img.jpg');
+                    const filename = './__exchange_img.jpg';
+                    img.write(filename);
 
-                    await message.channel.send({ files: [ '__exchange_img.jpg' ] });
+                    await message.channel.send({ files: [ filename ] });
 
-                    fs.unlink('__exchange_img.jpg', (err) => {
+                    fs.unlink(filename, (err) => {
                         if (err) {
                             console.error(err);
                         }
                     });
                 }
             }
-
-            console.log(data);
         } catch (e) {
             console.error(e);
         }

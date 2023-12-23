@@ -27,6 +27,10 @@ module.exports = {
             response += `<:${emoji.name}:${emoji.discord_id}> — ${emoji.count}\n`;
         });
 
+        if(emojies.length === 0) {
+            return;
+        }
+
         message.channel.send(response);
     },
 };

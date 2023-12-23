@@ -3,6 +3,12 @@
 const fs      = require('fs');
 const config  = require('../config');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const gm = require('gm').subClass({ imageMagick: true });
+
+const db = require("../database");
+const Emoji   = db.models.Emoji;
+const Message = db.models.Message;
+const TargetedUser = db.models.TargetUser;
 
 const client = new Client({
     intents: [
@@ -30,7 +36,7 @@ for (const file of commandFiles) {
 }
 
 
-client.on('message', message => {
+client.on('messageCreate', message => {
     const
         isCommand     = message.content.startsWith(config.prefix),
         isMentionsBot = message.mentions.users.size > 0 && message.mentions.users.first().id === client.user.id;
@@ -124,6 +130,91 @@ client.on('message', message => {
         console.error(error);
         message.reply('there was an error trying to execute that command!');
     }
+});
+
+client.on('messageCreate', message => {
+    if (message.content.startsWith(config.prefix) || message.author.bot) return;
+
+
+    Message.create({
+        discord_id: message.id,
+        author:     message.author.id,
+        content:    message.content,
+        channel_id: message.channel.id,
+    });
+
+
+    let emojies = Emoji.getFromMessage(message.content);
+
+    for (let emoji_id in emojies) {
+        Emoji.createOrUpdate(message.channel.id, emojies[emoji_id]);
+    }
+});
+
+client.on("presenceUpdate", async (oldPresence, newPresence) => {
+    const target = await TargetedUser.findOne({
+        where: {
+            service: "game_bully",
+            enabled: true,
+        }
+    });
+    console.log(target);
+    if (!target) { return; }
+    const targetId = target.userId;
+    const guildId = target.guildId;
+    const channelId = target.channelId;
+
+    if (oldPresence.guild.id !== guildId) {
+        return;
+    }
+    if (!(oldPresence.activities.length === 0 && newPresence.activities.length > 0)) {
+        return;
+    }
+    if (newPresence.user.id !== targetId) {
+        return;
+    }
+    if (Math.random() < .5) {
+        return;
+    }
+
+    const filename = './__jeka_playing_img.jpg';
+    const channel = await newPresence.guild.channels.fetch(channelId);
+    const targetedUser = newPresence.member;
+    // console.log(channel)
+    const sender = async () => {
+        try {
+            await channel.send({ files: [ filename ] });
+
+            if (Math.random() < .2) {
+                await channel.send('мнение?');
+            }
+        }
+        catch (err) {
+            console.log(err)
+        }
+    };
+
+    // const targetedUser = guild.members.cache.get(jekaId);
+
+    const username = targetedUser.displayName;
+    const activity = newPresence.activities[0].name;
+    let text = `${username} играет в ${activity}`;
+
+    if (username.length > 20) {
+        text = `${username}\nиграет в ${activity}`;
+    }
+
+    gm('https://i.imgur.com/FQdRJy6.png')
+        .font('./font/PressStart2P-Regular.ttf', 20)
+        .drawText(30, 50, text)
+        .write(filename, function (err) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+
+            sender();
+        });
 });
 
 
