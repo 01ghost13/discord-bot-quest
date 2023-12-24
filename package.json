@@ -5,7 +5,7 @@
   "main": "bot_index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "npx sequelize-cli db:migrate"
+    "db_migrate": "npx sequelize-cli db:migrate"
   },
   "repository": {
     "type": "git",
@@ -19,14 +19,18 @@
   },
   "homepage": "https://github.com/01ghost13/discord-bot-quest#readme",
   "dependencies": {
-    "discord.js": "^11.5.1",
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3",
+    "discord.js": "^14.14.1",
     "express": "^4.17.1",
+    "jimp": "^0.22.10",
+    "gm": "^1.25.0",
     "moment": "^2.24.0",
-    "pg": "^7.11.0",
-    "pg-hstore": "^2.3.3",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
     "redis": "^2.8.0",
-    "sequelize": "^5.8.9",
-    "sequelize-cli": "^5.5.0"
+    "sequelize": "^6.35.2",
+    "sequelize-cli": "^6.6.2"
   },
   "devDependencies": {
     "nodemon": "^1.19.1"

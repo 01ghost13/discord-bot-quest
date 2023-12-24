@@ -1,0 +1,11 @@
+.idea
+nbproject
+.buildpath
+.project
+.settings
+.DS_Store
+.git
+.github
+Dockerfile
+.gitignore
+README.md

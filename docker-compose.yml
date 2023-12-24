@@ -1,0 +1,59 @@
+networks:
+  bot-network:
+    driver: bridge
+
+services:
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: node
+    restart: always
+    networks:
+      - bot-network
+    depends_on:
+      - redis
+      - postgresql
+    volumes:
+      - .:/app:rw
+    environment:
+      TZ: "Europe/Moscow"
+      NODE_ENV: "production"
+
+      BOT_TOKEN: "${BOT_TOKEN}"
+      SECURE_TOKEN: "${SECURE_TOKEN}"
+
+      CHANNEL_FOR_ERRORS: "${CHANNEL_FOR_ERRORS}"
+      MESSAGES_EXPORT_LIMIT: "${MESSAGES_EXPORT_LIMIT}"
+      MESSAGES_EXPORT_CHANNEL: "${MESSAGES_EXPORT_CHANNEL}"
+
+      REDIS_URL: "${REDIS_URL}"
+      DATABASE_URL: "${DATABASE_URL}"
+    command: /bin/sh -c "cd /app && npm install && npm run db_migrate && node /app/bot_index.js"
+  postgresql:
+    image: postgres:15.1-alpine3.16
+    restart: always
+    networks:
+      - bot-network
+    environment:
+      POSTGRES_DB: "botdb"
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - /var/discord-bot-postgresql:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d botdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  redis:
+    image: redis:7.0.5-alpine3.16
+    restart: always
+    networks:
+      - bot-network
+    volumes:
+      - /var/discord-bot-redis:/data:rw
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
