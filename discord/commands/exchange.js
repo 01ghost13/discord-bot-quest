@@ -36,7 +36,7 @@ module.exports = {
                     const img = await jimp.read(imgUrl);
 
                     img.print(font, 15, 5, `МНЕ ${map[code]} ПО ${val.toFixed(2)} И МОЕМУ СЫНУ ТОЖЕ`);
-                    const filename = './__exchange_img.jpg';
+                    const filename = '__exchange_img.jpg';
                     img.write(filename);
 
                     await message.channel.send({ files: [ filename ] });
