@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    user: node
+#    user: node
     restart: always
     networks:
       - bot-network
