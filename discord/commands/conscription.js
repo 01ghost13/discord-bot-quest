@@ -53,7 +53,8 @@ module.exports = {
     async execute (message, args) {
         let mentions = [];
 
-        message.guild.members.forEach(member => {
+        const members = await message.guild.members.fetch()
+        members.forEach(member => {
             const user = member.user;
 
             if (user.bot || user.id === message.author.id) {

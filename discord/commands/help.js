@@ -17,8 +17,7 @@ module.exports = {
                     .map(command => `\`${config.prefix}${command.name}${command.usage ? (' ' + command.usage) : ''}\`: ${command.description}`)
                     .join('\n')
             );
-
-            return message.channel.send(data, { split: true });
+            return message.channel.send(data.join('\n'));
         }
 
         const name    = args[0].toLowerCase();
@@ -29,7 +28,6 @@ module.exports = {
         }
 
         data.push(`\`${config.prefix}${command.name}${command.usage ? (' ' + command.usage) : ''}\`: ${command.description}`);
-
-        return message.channel.send(data, { split: true });
+        return message.channel.send(data.join('\n'));
     },
 };

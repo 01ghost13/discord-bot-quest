@@ -18,9 +18,9 @@ module.exports = {
                 ['count', 'DESC']
             ]
         });
-
+        const guild_emojies = await message.guild.emojis.fetch();
         emojies.forEach(emoji => {
-            if (!message.guild.emojis.find(val => val.id === emoji.discord_id)) {
+            if (!guild_emojies.find(val => val.id === emoji.discord_id)) {
                 return;
             }
 
